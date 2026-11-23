@@ -2,7 +2,7 @@ services:
   - type: web
     name: ghostclipper
     runtime: docker
-    plan: starter
+    plan: free
     region: oregon
     dockerfilePath: ./Dockerfile
     dockerContext: .
@@ -22,6 +22,9 @@ services:
       #   sync: false
       # - key: STRIPE_WEBHOOK_SECRET
       #   sync: false
+    # FREE PLAN: sleeps after 15 min idle; first request takes ~30-60s to wake.
+    # The desktop app uses 65s timeouts to tolerate this. Upgrade to `starter`
+    # when you need instant responses / no cold starts.
     # data/users.json + credits.json live inside the container. On a free
     # starter plan this is ephemeral across deploys — add a persistent disk
     # before taking real payments, or move to a managed DB (see LAUNCH.md).
