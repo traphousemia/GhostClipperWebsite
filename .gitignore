@@ -8,3 +8,6 @@ __pycache__/
 .env
 *.log
 .DS_Store
+
+# local screenshots for the user (not part of the site)
+preview/
