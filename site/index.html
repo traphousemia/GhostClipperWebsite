@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GhostClipper — Smart clips, automatically</title>
+<style>
+:root{--bg:#080910;--stroke:rgba(255,255,255,.11);--txt:#f6f6fa;--muted:#9294aa;
+  --acc:#8b6cff;--acc2:#3fd8ff;--good:#31e6a6}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",sans-serif;
+  color:var(--txt);background:
+  radial-gradient(900px 520px at 12% -5%,rgba(139,108,255,.16),transparent 60%),
+  radial-gradient(800px 500px at 92% 8%,rgba(63,216,255,.11),transparent 60%),
+  linear-gradient(160deg,#0d0f1a,var(--bg));min-height:100vh;-webkit-font-smoothing:antialiased;
+  display:flex;flex-direction:column}
+.wrap{max-width:1000px;margin:0 auto;padding:0 28px;width:100%}
+header{display:flex;align-items:center;justify-content:space-between;padding:24px 0}
+.brand{display:flex;align-items:center;gap:12px;font-size:19px;font-weight:800;letter-spacing:-.3px}
+.logo{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;
+  background:linear-gradient(135deg,var(--acc),var(--acc2));box-shadow:0 8px 24px rgba(139,108,255,.4)}
+.logo svg{width:25px;height:25px}
+.logo .brandghost{width:25px;height:25px;object-fit:contain}
+nav{display:flex;gap:10px}
+.btn{padding:11px 18px;border-radius:11px;border:1px solid var(--stroke);cursor:pointer;
+  background:rgba(255,255,255,.05);color:var(--txt);font-size:13px;font-weight:700;text-decoration:none;display:inline-block}
+.btn:hover{border-color:var(--acc)}
+.btn.primary{background:linear-gradient(135deg,var(--acc),var(--acc2));border:none;color:#fff}
+
+main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 0 46px}
+h1{font-size:clamp(30px,4.5vw,46px);font-weight:800;letter-spacing:-1.6px;text-align:center}
+h1 em{font-style:normal;background:linear-gradient(135deg,var(--acc),var(--acc2));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.lead{color:var(--muted);font-size:15px;text-align:center;margin:12px 0 28px}
+
+/* mock app window */
+.app{width:100%;max-width:720px;border-radius:22px;padding:20px 22px 24px;
+  background:linear-gradient(150deg,rgba(255,255,255,.08),rgba(255,255,255,.025));
+  border:1px solid var(--stroke);box-shadow:0 30px 80px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.08);
+  position:relative;overflow:hidden}
+.app::before{content:"";position:absolute;inset:-40% -10% auto;height:180px;
+  background:radial-gradient(closest-side,rgba(139,108,255,.25),transparent);opacity:.5;pointer-events:none}
+.app-top{display:flex;align-items:center;gap:10px;margin-bottom:18px;position:relative}
+.mini{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;
+  background:linear-gradient(135deg,var(--acc),var(--acc2))}
+.mini svg{width:17px;height:17px}
+.app-name{font-weight:800;font-size:14px}
+.app-tab{margin-left:14px;font-size:11px;color:var(--muted);border-bottom:2px solid var(--acc);padding-bottom:3px}
+.app-status{margin-left:auto;font-size:10px;color:var(--good);display:flex;align-items:center;gap:6px}
+.app-status i{width:7px;height:7px;border-radius:50%;background:var(--good);display:inline-block}
+
+.urlbox{display:flex;align-items:center;gap:8px;padding:8px 8px 8px 14px;border-radius:12px;
+  background:rgba(0,0,0,.35);border:1px solid var(--stroke);position:relative}
+.urlbox .lnk{opacity:.7;font-size:14px}
+.urlbox .url{flex:1;font-size:12.5px;color:var(--muted);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  white-space:nowrap;overflow:hidden}
+.urlbox .url b{color:var(--txt);font-weight:600}
+.go{padding:9px 16px;border:none;border-radius:9px;font-size:12px;font-weight:800;color:#fff;
+  background:linear-gradient(135deg,var(--acc),var(--acc2));white-space:nowrap}
+.caret{display:inline-block;width:1.5px;height:13px;background:var(--acc2);vertical-align:-2px;margin-left:1px;
+  animation:blink .7s step-end infinite}
+@keyframes blink{50%{opacity:0}}
+
+.prog{height:5px;border-radius:5px;background:rgba(255,255,255,.08);margin:16px 0 0;overflow:hidden;opacity:0;transition:opacity .3s}
+.prog.on{opacity:1}
+.prog i{display:block;height:100%;width:0;border-radius:5px;
+  background:linear-gradient(90deg,var(--acc),var(--acc2));transition:width 1.6s ease}
+.prog.on i{width:100%}
+.phase{font-size:11px;color:var(--muted);margin-top:8px;height:14px;opacity:0;transition:opacity .3s}
+.phase.on{opacity:1}
+
+/* clip reveal: window stays compact until clips print, then opens smoothly */
+.clips-wrap{max-height:0;opacity:0;overflow:hidden;
+  transition:max-height .7s cubic-bezier(.2,.7,.2,1),opacity .5s ease,margin-top .7s ease;
+  margin-top:0}
+.clips-wrap.open{max-height:460px;opacity:1;margin-top:16px}
+.clips{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.clip{border-radius:14px;overflow:hidden;background:rgba(255,255,255,.04);border:1px solid var(--stroke);
+  opacity:0;transform:translateY(12px) scale(.97);transition:opacity .45s,transform .45s}
+.clip.show{opacity:1;transform:none}
+.thumb{aspect-ratio:9/14;position:relative;background:linear-gradient(150deg,var(--c1),var(--c2));
+  display:grid;place-items:center;overflow:hidden}
+.thumb::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,.55))}
+.emoji{font-size:34px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.35));position:relative;z-index:1}
+.score{position:absolute;top:8px;left:8px;z-index:2;font-size:9px;font-weight:800;padding:3px 7px;border-radius:6px;
+  background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff}
+.dur{position:absolute;top:8px;right:8px;z-index:2;font-size:9px;font-weight:700;padding:3px 6px;border-radius:6px;background:rgba(0,0,0,.55)}
+.cap{position:absolute;bottom:12px;left:8px;right:8px;z-index:2;text-align:center;
+  font-size:11px;font-weight:800;color:#fff;text-shadow:0 2px 6px #000}
+.cbody{padding:9px 10px}
+.cbody b{font-size:11px;display:block;min-height:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cbody small{font-size:9.5px;color:var(--muted);display:block;margin-top:3px}
+
+.cta{margin-top:26px;text-align:center}
+.cta .btn{padding:14px 24px;font-size:14px}
+footer{padding:24px 0 30px;text-align:center;color:var(--muted);font-size:13px;opacity:.9}
+.cta .btn.primary{box-shadow:0 12px 30px rgba(139,108,255,.35);padding:15px 28px;font-size:15px}
+@media(max-width:560px){.clips{gap:8px}.cap{font-size:9px}.emoji{font-size:26px}.urlbox .url{font-size:10px}}
+</style>
+<style>.brandghost{object-fit:contain}</style><link rel="icon" type="image/svg+xml" href="/favicon.svg"></head>
+<body>
+<div class="wrap">
+<header>
+  <div class="brand"><span class="logo"><img src="/logo.png" alt="GhostClipper" class="brandghost"></span>GhostClipper</div>
+  <nav>
+    <a class="btn" href="/dashboard">Sign in</a>
+    <a class="btn primary" href="/signup">Sign up</a>
+  </nav>
+</header>
+
+<main>
+  <h1>Paste a link. Get <em>clips.</em></h1>
+  <p class="lead">Drop in a YouTube, Twitch or Kick video. GhostClipper finds the best moments and prints vertical, captioned clips.</p>
+
+  <div class="app" id="app">
+    <div class="app-top">
+      <div class="mini"><img src="/logo.png" alt="GhostClipper" class="brandghost"></div>
+      <span class="app-name">GhostClipper</span>
+      <span class="app-tab">URL Clipping</span>
+      <span class="app-status"><i></i><span id="statusTxt">Ready</span></span>
+    </div>
+
+    <div class="urlbox"><span class="lnk">🔗</span><span class="url"><b id="urlText"></b><span class="caret" id="caret"></span></span><span class="go">Find clips →</span></div>
+
+    <div class="prog" id="prog"><i></i></div>
+    <div class="phase" id="phase"></div>
+    <div class="clips-wrap" id="clipsWrap"><div class="clips" id="clips"></div></div>
+  </div>
+
+  <div class="cta"><a class="btn primary" href="/signup">Get started free →</a></div>
+</main>
+
+<footer>Sign up here, then sign in on the desktop app — your account links them together.<br><br><a href="/terms" style="color:inherit">Terms</a> · <a href="/privacy" style="color:inherit">Privacy</a></footer>
+</div>
+
+<script>
+const APP=document.getElementById('app');
+const urlText=document.getElementById('urlText'),caret=document.getElementById('caret');
+const prog=document.getElementById('prog'),phase=document.getElementById('phase');
+const clipsEl=document.getElementById('clips'),clipsWrap=document.getElementById('clipsWrap'),statusTxt=document.getElementById('statusTxt');
+
+const URLS=[
+  'youtube.com/watch?v=stream-highlights',
+  'twitch.tv/videos/funniest-moment',
+  'kick.com/videos/clutch-play'
+];
+const CLIPS=[
+  [{e:'😱',t:'Wait — he actually did that?',s:'S VIRAL',d:'0:20',c1:'#7b5cff',c2:'#3fd8ff',cap:'NO WAYYY 😱'},
+   {e:'💀',t:'the chat went crazy',s:'A GREAT',d:'0:15',c1:'#ff6b81',c2:'#ffb56b',cap:'LMAOOO 💀'},
+   {e:'🔥',t:'that clutch was unreal',s:'S VIRAL',d:'0:30',c1:'#31e6a6',c2:'#20c9d8',cap:'INSANE 🔥'}],
+  [{e:'😂',t:'he cannot stop laughing',s:'A GREAT',d:'0:20',c1:'#c084fc',c2:'#67e8f9',cap:'IM DYING 😂'},
+   {e:'😳',t:'did he just say that?',s:'S VIRAL',d:'0:15',c1:'#38bdf8',c2:'#6366f1',cap:'BRO WHAT 😳'},
+   {e:'🎮',t:'clutch of the year',s:'A GREAT',d:'0:30',c1:'#fbbf24',c2:'#f97316',cap:'GG 🔥'}],
+  [{e:'🤯',t:'nobody saw this coming',s:'S VIRAL',d:'0:20',c1:'#f472b6',c2:'#a855f7',cap:'WTF 🤯'},
+   {e:'😭',t:'chat is in shambles',s:'A GREAT',d:'0:15',c1:'#2dd4bf',c2:'#3b82f6',cap:'CRYYYY 😭'},
+   {e:'⚡',t:'instant classic',s:'S VIRAL',d:'0:30',c1:'#8b6cff',c2:'#31e6a6',cap:'LETS GO ⚡'}]
+];
+const COLORS=[['#8b6cff','#3fd8ff'],['#ff6b81','#ffb56b'],['#31e6a6','#20c9d8'],['#c084fc','#67e8f9'],['#fbbf24','#f97316']];
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function setHue(a,b){
+  APP.style.setProperty('--acc',a);APP.style.setProperty('--acc2',b);
+  document.documentElement.style.setProperty('--acc',a);
+  document.documentElement.style.setProperty('--acc2',b);
+}
+function typeUrl(text){
+  return new Promise(async res=>{
+    urlText.textContent='';caret.style.display='inline-block';
+    for(let i=0;i<text.length;i++){urlText.textContent+=text[i];await sleep(26)}
+    caret.style.display='none';res();
+  });
+}
+// Build the three card shells ONCE so the container never collapses (no layout shift).
+clipsEl.innerHTML=[0,1,2].map(()=>`
+  <div class="clip">
+    <div class="thumb">
+      <span class="score"></span><span class="dur"></span>
+      <span class="emoji"></span><span class="cap"></span>
+    </div>
+    <div class="cbody"><b></b><small>captions added automatically</small></div>
+  </div>`).join('');
+const clipEls=[...clipsEl.children];
+function renderClips(list){
+  list.forEach((c,idx)=>{
+    const el=clipEls[idx];
+    el.querySelector('.thumb').style.setProperty('--c1',c.c1);
+    el.querySelector('.thumb').style.setProperty('--c2',c.c2);
+    el.querySelector('.score').textContent=c.s;
+    el.querySelector('.dur').textContent=c.d;
+    el.querySelector('.emoji').textContent=c.e;
+    el.querySelector('.cap').textContent=c.cap;
+    el.querySelector('.cbody b').textContent=c.t;
+  });
+}
+async function loop(){
+  let i=0;
+  while(true){
+    const [a,b]=COLORS[i%COLORS.length];setHue(a,b);
+    // close the window smoothly — cards stay in the DOM
+    clipEls.forEach(c=>c.classList.remove('show'));
+    clipsWrap.classList.remove('open');
+    prog.classList.remove('on');phase.classList.remove('on');
+    prog.querySelector('i').style.width='0';statusTxt.textContent='Ready';
+    await sleep(500);
+    await typeUrl(URLS[i%URLS.length]);
+    await sleep(450);
+    statusTxt.textContent='Clipping…';prog.classList.add('on');phase.classList.add('on');
+    for(const s of ['Finding the best moments…','AI captions — transcribing…','Cutting & captioning clips…']){
+      phase.textContent=s;await sleep(560);
+    }
+    statusTxt.textContent='Done';phase.textContent='3 clips ready ↓';
+    renderClips(CLIPS[i%CLIPS.length]);
+    clipsWrap.classList.add('open');            // window opens smoothly
+    await sleep(600);
+    clipEls.forEach((c,idx)=>setTimeout(()=>c.classList.add('show'),idx*220));
+    await sleep(3200);
+    i++;
+  }
+}
+loop();
+</script>
+</body>
+</html>

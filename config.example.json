@@ -1,0 +1,48 @@
+{
+  "port": 8899,
+  "public_url": "https://ghostclipper.app",
+  "token_secret": "SET_VIA_ENV_TOKEN_SECRET",
+  "google_client_id": "",
+  "google_client_secret": "",
+  "webhook_key": "SET_VIA_ENV_WEBHOOK_KEY",
+  "min_app_version": "1.0.0",
+  "maintenance": false,
+  "maintenance_message": "",
+  "update_url": "",
+  "payments_enabled": false,
+  "stripe_publishable_key": "",
+  "stripe_secret_key": "",
+  "checkout": {
+    "starter": "",
+    "creator": "",
+    "studio": ""
+  },
+  "billing_portal_url": "",
+  "plans": [
+    {
+      "id": "starter",
+      "name": "Starter",
+      "usd": 4.99,
+      "credits": 200,
+      "tier": "pro",
+      "blurb": "1 streamer, 24/7"
+    },
+    {
+      "id": "creator",
+      "name": "Creator",
+      "usd": 12.99,
+      "credits": 600,
+      "tier": "pro",
+      "blurb": "6 streamers, 24/7"
+    },
+    {
+      "id": "studio",
+      "name": "Studio",
+      "usd": 19.99,
+      "credits": 1000,
+      "tier": "team",
+      "blurb": "Unlimited streams"
+    }
+  ],
+  "stripe_webhook_secret": ""
+}

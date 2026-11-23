@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: ghostclipper
+    runtime: docker
+    plan: starter
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    envVars:
+      - key: PORT
+        value: "8080"
+      - key: PUBLIC_URL
+        value: https://ghostclipper.onrender.com
+      - key: TOKEN_SECRET
+        generateValue: true
+      - key: WEBHOOK_KEY
+        generateValue: true
+      # Set these when you have them:
+      # - key: GOOGLE_CLIENT_ID
+      #   sync: false
+      # - key: GOOGLE_CLIENT_SECRET
+      #   sync: false
+      # - key: STRIPE_WEBHOOK_SECRET
+      #   sync: false
+    # data/users.json + credits.json live inside the container. On a free
+    # starter plan this is ephemeral across deploys — add a persistent disk
+    # before taking real payments, or move to a managed DB (see LAUNCH.md).

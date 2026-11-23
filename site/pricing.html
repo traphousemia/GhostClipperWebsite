@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pricing — GhostClipper</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<style>
+:root{--bg:#080910;--stroke:rgba(255,255,255,.11);--txt:#f6f6fa;--muted:#9294aa;
+  --acc:#8b6cff;--acc2:#3fd8ff;--good:#31e6a6}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",sans-serif;
+  color:var(--txt);background:
+  radial-gradient(900px 520px at 15% -5%,rgba(139,108,255,.16),transparent 60%),
+  radial-gradient(800px 500px at 90% 8%,rgba(63,216,255,.11),transparent 60%),
+  linear-gradient(160deg,#0d0f1a,var(--bg));min-height:100vh;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+header{display:flex;align-items:center;justify-content:space-between;padding:24px 0}
+.brand a{display:flex;align-items:center;gap:12px;color:inherit;text-decoration:none;font-size:19px;font-weight:800;letter-spacing:-.3px}
+.logo{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;
+  background:linear-gradient(135deg,var(--acc),var(--acc2));box-shadow:0 8px 24px rgba(139,108,255,.4)}
+.logo img{width:26px;height:26px;object-fit:contain}
+nav{display:flex;gap:10px}
+.btn{padding:11px 18px;border-radius:11px;border:1px solid var(--stroke);cursor:pointer;
+  background:rgba(255,255,255,.05);color:var(--txt);font-size:13px;font-weight:700;text-decoration:none;display:inline-block;transition:border-color .2s,transform .2s}
+.btn:hover{border-color:var(--acc);transform:translateY(-1px)}
+.btn.primary{background:linear-gradient(135deg,var(--acc),var(--acc2));border:none;color:#fff}
+.head{text-align:center;margin:46px 0 8px}
+h1{font-size:clamp(34px,5vw,50px);letter-spacing:-2px}
+.sub{color:var(--muted);font-size:15px;margin-top:12px;line-height:1.6}
+.unit{display:inline-flex;align-items:center;gap:8px;margin-top:16px;padding:7px 14px;border-radius:999px;
+  border:1px solid var(--stroke);background:rgba(255,255,255,.03);color:var(--muted);font-size:12px}
+.unit b{color:var(--txt)}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;padding:36px 0 24px;align-items:stretch}
+.plan{position:relative;text-align:left;border-radius:20px;padding:24px 20px;
+  background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.02));
+  border:1px solid var(--stroke);display:flex;flex-direction:column}
+.plan.popular{border-color:var(--acc);background:linear-gradient(160deg,rgba(139,108,255,.16),rgba(139,108,255,.04));
+  box-shadow:0 18px 50px rgba(139,108,255,.18);transform:translateY(-6px)}
+.badge{position:absolute;top:-12px;left:20px;background:linear-gradient(135deg,var(--acc),var(--acc2));
+  color:#fff;font-size:10px;font-weight:800;letter-spacing:.6px;padding:5px 12px;border-radius:999px;text-transform:uppercase}
+.pname{font-size:12px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--muted)}
+.plan.popular .pname{color:#cbb8ff}
+.price{font-size:36px;font-weight:800;letter-spacing:-1.5px;margin:10px 0 2px;line-height:1}
+.price small{font-size:13px;color:var(--muted);font-weight:500;letter-spacing:0}
+.credits{font-size:12.5px;color:var(--acc2);font-weight:700;margin-top:10px}
+.divider{height:1px;background:var(--stroke);margin:16px 0}
+.plan ul{list-style:none;color:#c3c5d6;font-size:12.5px;line-height:1.5;margin:0 0 20px;flex:1}
+.plan li{display:flex;gap:8px;align-items:flex-start;margin-bottom:10px}
+.plan li i{color:var(--good);font-style:normal;font-weight:800;flex:none}
+.plan .btn{width:100%;padding:12px;text-align:center;background:rgba(255,255,255,.06)}
+.plan.popular .btn{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff;border:none}
+.note{text-align:center;color:var(--muted);font-size:10.5px;margin-top:8px;min-height:14px}
+.faq{max-width:760px;margin:30px auto 60px}
+.faq h2{font-size:20px;letter-spacing:-.5px;margin-bottom:18px;text-align:center}
+.q{border-top:1px solid var(--stroke);padding:16px 0}
+.q b{font-size:14px}
+.q p{color:var(--muted);font-size:13px;margin-top:6px;line-height:1.6}
+footer{border-top:1px solid var(--stroke);padding:22px 0 30px;text-align:center;color:var(--muted);font-size:12px}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.plan.popular{transform:none}}
+@media(max-width:560px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="brand"><a href="/"><span class="logo"><img src="/logo.png" alt="GhostClipper"></span>GhostClipper</a></div>
+  <nav><a class="btn" href="/dashboard">Sign in</a><a class="btn primary" href="/signup">Sign up</a></nav>
+</header>
+
+<div class="head">
+  <h1>Simple, honest pricing</h1>
+  <p class="sub">Start free with 60 credits a month. Upgrade for more credits and watermark-free clips.<br>No card needed to start.</p>
+  <div class="unit">1 credit = 1 minute of uploaded video &nbsp;·&nbsp; credits reset monthly</div>
+</div>
+
+<div class="grid" id="planGrid"></div>
+
+<div class="faq">
+  <h2>Good to know</h2>
+  <div class="q"><b>What can I do for free?</b><p>60 credits every month, full URL clipping, captions and vertical formatting. Free clips carry a small GhostClipper.app watermark.</p></div>
+  <div class="q"><b>What is a credit?</b><p>One credit covers one minute of uploaded video. A 3-minute stream costs 3 credits. Credits reset at the start of each billing month.</p></div>
+  <div class="q"><b>When can I pay?</b><p>Paid plans open when checkout goes live. Until then every account gets the free tier — no card, no charges.</p></div>
+</div>
+<footer>© GhostClipper — smart clips, automatically &nbsp;·&nbsp; <a href="/terms" style="color:inherit">Terms</a> · <a href="/privacy" style="color:inherit">Privacy</a></footer>
+</div>
+
+<script>
+const PLANS=[
+  {id:'starter',name:'Starter',usd:4.99,credits:200,desc:'For getting serious',blurb:'1 streamer · 24/7',pop:false},
+  {id:'creator',name:'Creator',usd:12.99,credits:600,desc:'For growing creators',blurb:'6 streamers · 24/7',pop:true},
+  {id:'studio',name:'Studio',usd:19.99,credits:1000,desc:'For heavy users',blurb:'Unlimited streamers',pop:false}
+];
+fetch('/api/plans').then(r=>r.json()).then(d=>{
+  const cfg={}; (d.plans||[]).forEach(p=>cfg[p.id]=p);
+  const ready=!!d.payments_enabled;
+  const free=`<div class="plan">
+    <h3 class="pname">Free</h3>
+    <div class="price">$0<small>/mo</small></div>
+    <div class="credits">60 credits / month</div>
+    <div class="divider"></div>
+    <ul>
+      <li><i>✓</i> URL clipping from YouTube, Twitch &amp; Kick</li>
+      <li><i>✓</i> Auto captions &amp; vertical reframe</li>
+      <li><i>✓</i> GhostClipper.app watermark on clips</li>
+    </ul>
+    <a class="btn" href="/signup">Get started free</a>
+    <div class="note">No card required</div>
+  </div>`;
+  const paid=PLANS.map(p=>{
+    const live=ready && cfg[p.id] && cfg[p.id].checkout_ready;
+    return `<div class="plan ${p.pop?'popular':''}">
+      ${p.pop?'<span class="badge">Most popular</span>':''}
+      <h3 class="pname">${p.name}</h3>
+      <div class="price">$${p.usd.toFixed(2)}<small>/mo</small></div>
+      <div class="credits">${p.credits} credits / month</div>
+      <div class="divider"></div>
+      <ul>
+        <li><i>✓</i> ${p.desc}</li>
+        <li><i>✓</i> No watermark on clips</li>
+        <li><i>✓</i> ${p.blurb}</li>
+        <li><i>✓</i> All AI clipping features</li>
+      </ul>
+      ${live
+        ? `<button class="btn" onclick="checkout('${p.id}')">Choose ${p.name}</button><div class="note">Secure checkout</div>`
+        : `<a class="btn" href="/signup">Get started free</a><div class="note">Paid billing opens at launch</div>`}
+    </div>`;
+  }).join('');
+  document.getElementById('planGrid').innerHTML=free+paid;
+}).catch(()=>{document.getElementById('planGrid').innerHTML='<p style="color:var(--muted)">Plans are temporarily unavailable.</p>'});
+async function checkout(id){
+  const token=localStorage.getItem('gc_token')||'';
+  const j=await(await fetch('/api/payment/checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({plan:id,token})})).json();
+  if(j.ok&&j.url)location.href=j.url; else alert(j.error||'Checkout is not available yet.');
+}
+</script>
+</body></html>

@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Create account — GhostClipper</title><link rel="stylesheet" href="/auth.css"><link rel="icon" type="image/svg+xml" href="/favicon.svg"></head>
+<body>
+<div class="bg"><span class="orb a"></span><span class="orb b"></span></div>
+<div class="shell">
+<header>
+  <a class="brand" href="/"><span class="logo"><img src="/logo.png" alt="GhostClipper" class="brandghost"></span>GhostClipper</a>
+  <nav><a class="btn" href="/dashboard">Sign in</a></nav>
+</header>
+
+<div class="stage"><div class="auth-grid">
+  <div class="pitch">
+    <h1>Your best clips<br>start <em>here.</em></h1>
+    <p>One account connects the website and the desktop app. Sign up, get your token, and start turning streams into scroll-stopping clips.</p>
+    <div class="perks">
+      <div class="perk"><i>✦</i><span>60 free credits every month — no card needed</span></div>
+      <div class="perk"><i>⚡</i><span>Vertical, captioned clips in minutes</span></div>
+      <div class="perk"><i>🔗</i><span>Your account syncs to the app</span></div>
+    </div>
+    <div class="mini-demo">
+      <div class="dots"><i></i><i></i><i></i></div>
+      <div class="row"><b>youtube.com/watch?v=…</b> → pasted into GhostClipper</div>
+      <div class="row" style="margin-top:7px">✦ finding moments · adding captions · <b>3 clips ready</b></div>
+    </div>
+  </div>
+
+  <div class="card-wrap"><div class="card" id="tilt">
+    <div class="ghost-top"><img src="/logo.png" alt="GhostClipper" class="brandghost"></div>
+    <h2>Create your account</h2>
+    <div class="sub">Free to start. No card needed.</div>
+    <label class="f">Name</label><input id="name" placeholder="Your name">
+    <label class="f">Email</label><input id="email" type="email" placeholder="you@example.com" autocomplete="username">
+    <label class="f">Password</label><input id="pass" type="password" placeholder="At least 6 characters" autocomplete="new-password">
+    <button class="act" onclick="signup()">Create account →</button>
+    <div class="or">or continue with</div>
+    <a class="gbtn" href="/api/auth/google/start"><span class="g">G</span> Google</a>
+    <div class="msg err" id="err"></div>
+    <div class="msg" id="ok"></div>
+    <div class="foot">Already have an account? <a href="/dashboard">Sign in</a></div>
+  </div></div>
+</div></div>
+<footer>© GhostClipper · Clip only what you have the rights to.</footer>
+</div>
+<script>
+const card=document.getElementById('tilt');
+document.querySelector('.stage').addEventListener('mousemove',e=>{
+  const r=card.getBoundingClientRect();
+  const x=(e.clientX-r.left-r.width/2)/r.width, y=(e.clientY-r.top-r.height/2)/r.height;
+  card.style.transform=`rotateY(${x*7}deg) rotateX(${-y*7}deg)`;
+});
+document.querySelector('.stage').addEventListener('mouseleave',()=>card.style.transform='');
+async function signup(){
+  const e=document.getElementById('err'),o=document.getElementById('ok');e.textContent='';o.textContent='';
+  const r=await fetch('/api/signup',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({name:document.getElementById('name').value.trim(),
+      email:document.getElementById('email').value.trim(),pass:document.getElementById('pass').value})});
+  const j=await r.json();
+  if(!r.ok||!j.ok){e.textContent=j.error||'Could not create account';return}
+  localStorage.setItem('gc_token',j.token);o.textContent='Account created — opening your dashboard…';
+  setTimeout(()=>location.href='/dashboard',800);
+}
+</script><div style="text-align:center;color:var(--muted);font-size:11px;padding:16px"><a href="/terms" style="color:inherit">Terms</a> · <a href="/privacy" style="color:inherit">Privacy</a></div></body></html>

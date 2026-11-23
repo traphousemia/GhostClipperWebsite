@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My account — GhostClipper</title><link rel="stylesheet" href="/auth.css"><link rel="icon" type="image/svg+xml" href="/favicon.svg"></head>
+<body>
+<div class="bg"><span class="orb a"></span><span class="orb b"></span></div>
+<div class="shell">
+<header>
+  <a class="brand" href="/"><span class="logo"><img src="/logo.png" alt="GhostClipper" class="brandghost"></span>GhostClipper</a>
+  <nav id="nav"><a class="btn" href="/">Home</a><a class="btn" href="/signup">Sign up</a><a class="btn primary" href="/dashboard">Sign in</a></nav>
+</header>
+
+<!-- SIGNED OUT -->
+<div class="stage" id="signedOut" style="display:none"><div class="auth-grid">
+  <div class="pitch">
+    <h1>Welcome<br><em>back.</em></h1>
+    <p>Sign in to see your credits, your clips and your plan — everything in one place.</p>
+    <div class="perks">
+      <div class="perk"><i>🔐</i><span>One account for site + app</span></div>
+      <div class="perk"><i>⚡</i><span>Your clips and credits in one place</span></div>
+      <div class="perk"><i>🎬</i><span>Ready to clip in seconds</span></div>
+    </div>
+    <div class="mini-demo">
+      <div class="dots"><i></i><i></i><i></i></div>
+      <div class="row"><b>Your account</b> → token → <b>GhostClipper app</b></div>
+    </div>
+  </div>
+  <div class="card-wrap"><div class="card" id="tiltOut">
+    <div class="ghost-top"><img src="/logo.png" alt="GhostClipper" class="brandghost"></div>
+    <h2>Sign in</h2>
+    <div class="sub">Welcome back. Enter your email and password to continue.</div>
+    <label class="f">Email</label><input id="email" type="email" placeholder="you@example.com" autocomplete="username">
+    <label class="f">Password</label><input id="pass" type="password" placeholder="Your password" autocomplete="current-password">
+    <button class="act" onclick="login()">Sign in →</button>
+    <div class="or">or continue with</div>
+    <a class="gbtn" href="/api/auth/google/start"><span class="g">G</span> Google</a>
+    <div class="msg err" id="lerr"></div>
+    <div class="foot">New here? <a href="/signup">Create an account</a></div>
+  </div></div>
+</div></div>
+
+<!-- SIGNED IN -->
+<div class="shell" id="signedIn" style="display:none;padding-top:60px">
+  <div class="hd"><h2>Your account</h2></div>
+  <div class="stack">
+    <div class="card" style="margin-left:0;max-width:none">
+      <label class="f">Signed in as</label>
+      <p id="who" style="font-size:15px;color:var(--txt);font-weight:700"></p>
+      <span class="badge" id="tierBadge"></span>
+    </div>
+    <div class="card" style="margin-left:0;max-width:none">
+      <h2>Your usage</h2>
+      <p id="usageText">Loading your stats…</p>
+    </div>
+    <div class="card" style="margin-left:0;max-width:none">
+      <h2>Recent activity</h2>
+      <div id="activityList" style="font-size:13px;color:var(--muted);line-height:1.7">Loading activity…</div>
+    </div>
+    <div class="card" style="margin-left:0;max-width:none" id="billingCard">
+      <h2>Plan &amp; billing</h2>
+      <p id="billingText">Your plan and payment details are managed securely through our payment provider.</p>
+      <div class="row"><a class="btn" href="/pricing">View plans</a><span id="billingBtns"></span></div>
+    </div>
+    <div class="card" style="margin-left:0;max-width:none">
+      <h2>Sign in to the app</h2>
+      <p>Copy this token, open GhostClipper, and choose "Paste sign-in token from website" — or just sign in with your email and password in the app.</p>
+      <code id="tokenBox">—</code>
+      <div class="row"><button class="btn" onclick="copyToken()">Copy token</button><a class="btn ghost" href="/pricing">View plans</a></div>
+      <div class="msg" id="msg"></div>
+    </div>
+  </div>
+  <footer>© GhostClipper</footer>
+</div>
+<footer id="outFoot" style="display:none">© GhostClipper · Clip only what you have the rights to.</footer>
+</div>
+<script>
+function token(){return localStorage.getItem('gc_token')||''}
+function setNav(signed){
+  document.getElementById('nav').innerHTML=signed
+    ? '<a class="btn ghost" href="/">Home</a><button class="btn" onclick="logout()">Sign out</button>'
+    : '<a class="btn ghost" href="/">Home</a><a class="btn" href="/signup">Sign up</a><a class="btn primary" href="/dashboard">Sign in</a>';
+}
+function showMsg(t,err){const m=document.getElementById('msg');m.textContent=t;m.className='msg'+(err?' err':'')}
+async function api(path,body){
+  const r=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...body,token:token()})});
+  return {r,j:await r.json().catch(()=>({}))};
+}
+async function login(){
+  const e=document.getElementById('lerr');e.textContent='';
+  const r=await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({email:document.getElementById('email').value.trim(),password:document.getElementById('pass').value})});
+  const j=await r.json();
+  if(!r.ok||!j.token){e.textContent=j.error||'Sign in failed';return}
+  localStorage.setItem('gc_token',j.token);location.reload();
+}
+function logout(){localStorage.removeItem('gc_token');location.reload()}
+function copyToken(){navigator.clipboard.writeText(document.getElementById('tokenBox').textContent).then(()=>showMsg('Token copied — paste it into the app.'))}
+function tilt(id){
+  const card=document.getElementById(id);if(!card)return;
+  card.closest('.stage').addEventListener('mousemove',e=>{
+    const r=card.getBoundingClientRect();
+    const x=(e.clientX-r.left-r.width/2)/r.width, y=(e.clientY-r.top-r.height/2)/r.height;
+    card.style.transform=`rotateY(${x*7}deg) rotateX(${-y*7}deg)`;
+  });
+  card.closest('.stage').addEventListener('mouseleave',()=>card.style.transform='');
+}
+async function load(){
+  if(!token()){document.getElementById('signedOut').style.display='flex';
+    document.getElementById('outFoot').style.display='block';setNav(false);tilt('tiltOut');return}
+  const {r,j}=await api('/api/account',{});
+  if(!r.ok||!j.email){localStorage.removeItem('gc_token');
+    document.getElementById('signedOut').style.display='flex';
+    document.getElementById('outFoot').style.display='block';setNav(false);tilt('tiltOut');return}
+  setNav(true);
+  document.getElementById('signedIn').style.display='block';
+  document.getElementById('who').textContent=`${j.name||j.email} · ${j.email}`;
+  document.getElementById('tierBadge').textContent=(j.tier||'trial').toUpperCase()+(j.expires?' · until '+new Date(j.expires*1000).toLocaleDateString():'');
+  document.getElementById('tokenBox').textContent=token();
+  // usage stats (from the desktop app when it's open)
+  const u=await fetch('/api/usage').then(r=>r.json()).catch(()=>({}));
+  document.getElementById('usageText').innerHTML=u.app_running===false
+    ? 'Open GhostClipper on this Mac to see live credits and clip counts here.'
+    : `<b style="color:var(--txt)">${u.credits_balance??0}</b> credits left of ${u.credits_lifetime??0} · `+
+      `<b style="color:var(--txt)">${u.credits_spent??0}</b> credits used · `+
+      `<b style="color:var(--txt)">${u.clips_saved??0}</b> clips saved`;
+  // Recent activity from the server-side audit log
+  const ah=await fetch('/api/account/history',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:token()})}).then(r=>r.json()).catch(()=>({}));
+  const al=document.getElementById('activityList');
+  if(al){
+    const ev=ah.events||[];
+    al.innerHTML=ev.length?ev.map(e=>{
+      const when=new Date(e.t*1000).toLocaleString();
+      const label={authorize:`Clip started · ${e.cost} credit${e.cost===1?'':'s'}`,
+                   finalize:'Clip finished',abort:'Clip refunded',denied:'Not enough credits',
+                   tier:'Plan updated'}[e.event]||e.event;
+      const delta=e.event==='authorize'||e.event==='denied'?`-${e.cost||0}`:'';
+      return `<div style="display:flex;justify-content:space-between;border-top:1px solid rgba(255,255,255,.08);padding:7px 0">
+        <span>${label}</span><span style="opacity:.65">${when}${delta?' · '+delta:''}</span></div>`;
+    }).join(''):'<div>No activity yet — your clips will show up here.</div>';
+  }
+  // payment-ready UI: buttons appear the moment Stripe links are configured
+  const ps=await fetch('/api/plans').then(r=>r.json()).catch(()=>({}));
+  const btns=document.getElementById('billingBtns'),txt=document.getElementById('billingText');
+  const pm=j.payment_method?' · Card on file: '+j.payment_method:'';
+  if(ps.payments_enabled){
+  const paid=(ps.plans||[]).filter(p=>p.checkout_ready);
+  btns.innerHTML=paid.map(p=>`<button class="btn ${p.id==='creator'?'primary':''}" onclick="checkout('${p.id}')">Get ${p.name}</button>`).join('');
+  if(ps.billing_ready)btns.innerHTML+='<button class="btn ghost" onclick="manageBilling()">Manage card / billing</button>';
+  txt.textContent='Your card is stored securely by our payment provider. Change it anytime in billing.'+pm;
+  }else{
+  btns.innerHTML='';txt.textContent='Paid plans and saved payment methods unlock at launch. Your free trial is active now.'+pm;
+  }
+}
+async function checkout(id){
+  const j=await(await fetch('/api/payment/checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({plan:id,token:token()})})).json();
+  if(j.ok&&j.url)location.href=j.url; else alert(j.error||'Checkout is not available yet.');
+}
+async function manageBilling(){
+  const j=await(await fetch('/api/plans')).json();
+  if(j.billing_url)location.href=j.billing_url;
+  else alert('Billing portal opens at launch.');
+}
+load();
+</script><div style="text-align:center;color:var(--muted);font-size:11px;padding:16px"><a href="/terms" style="color:inherit">Terms</a> · <a href="/privacy" style="color:inherit">Privacy</a></div></body></html>
