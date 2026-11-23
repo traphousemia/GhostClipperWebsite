@@ -22,6 +22,12 @@ On a managed host, set env vars `TOKEN_SECRET` / `WEBHOOK_KEY` — they override
 
 ---
 
+## 0.5 Source repository (DONE)
+- Private repo: https://github.com/traphousemia/GhostClipperWebsite
+- 20 files pushed to `main` (server, ledger, site pages, deploy files, docs).
+- `config.json`, `data/`, `.env` are git-ignored — secrets are supplied via env vars.
+- SSH deploy key `ghostclipper-deploy` is on this Mac (~/.ssh/id_ed25519_ghostclipper) and registered on GitHub.
+
 ## 1. Public hosting + domain
 
 You have two ready-to-use deploy files in this folder:
