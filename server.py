@@ -37,11 +37,11 @@ DEFAULT_CONFIG = {
     # public_url MUST be set via config.json or PUBLIC_URL env on any real host.
     "public_url": os.environ.get("PUBLIC_URL", "http://127.0.0.1:8899"),
     # Secrets come from the environment on managed hosts; dev defaults are only
-    # for local testing. TOKEN_SECRET and WEBHOOK_KEY must be set in production.
-    "token_secret": os.environ.get("TOKEN_SECRET", "ghostclipper-dev-token-secret"),
+    # Local dev supplies TOKEN_SECRET / WEBHOOK_KEY via git-ignored config.json.
+    "token_secret": os.environ.get("TOKEN_SECRET", ""),
     "google_client_id": os.environ.get("GOOGLE_CLIENT_ID", ""),
     "google_client_secret": os.environ.get("GOOGLE_CLIENT_SECRET", ""),
-    "webhook_key": os.environ.get("WEBHOOK_KEY", "change-me-before-taking-payments"),
+    "webhook_key": os.environ.get("WEBHOOK_KEY", ""),
     "min_app_version": "1.0.0",
     "maintenance": False,
     "maintenance_message": "",
